@@ -1,6 +1,3 @@
-# Service Account for GitHub Actions (no JSON key — org policy blocks it)
-# Instead, use Workload Identity Federation for keyless auth
-
 resource "google_service_account" "github_actions" {
   account_id   = "github-actions"
   display_name = "GitHub Actions CI/CD"
@@ -19,8 +16,6 @@ resource "google_project_iam_member" "github_actions_container_dev" {
   member  = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
-# Workload Identity Federation — allows GitHub Actions to authenticate
-# without a JSON key (keyless, more secure!)
 resource "google_iam_workload_identity_pool" "github" {
   workload_identity_pool_id = "github-pool"
   display_name              = "GitHub Actions Pool"
@@ -39,12 +34,13 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     "attribute.repository" = "assertion.repository"
   }
 
+  attribute_condition = "assertion.repository == 'pkrhce/travelbooking'"
+
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
 }
 
-# Allow GitHub Actions from YOUR repo to impersonate the SA
 resource "google_service_account_iam_member" "github_actions_wif" {
   service_account_id = google_service_account.github_actions.name
   role               = "roles/iam.workloadIdentityUser"
@@ -52,7 +48,7 @@ resource "google_service_account_iam_member" "github_actions_wif" {
 }
 
 output "wif_provider" {
-  description = "Use this value in GitHub Actions auth step"
+  description = "Use this in GitHub Actions auth step"
   value       = google_iam_workload_identity_pool_provider.github.name
 }
 
