@@ -11,9 +11,6 @@ output "artifact_registry_url" {
   value = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.docker.repository_id}"
 }
 
-output "ingress_ip" {
-  value = google_compute_global_address.ingress_ip.address
-}
 
 output "connect_to_cluster" {
   value = "gcloud container clusters get-credentials ${google_container_cluster.gke.name} --region ${var.region} --project ${var.project_id}"
