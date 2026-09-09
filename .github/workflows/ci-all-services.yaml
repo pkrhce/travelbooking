@@ -21,11 +21,11 @@ jobs:
     strategy:
       matrix:
         service:
-          - { name: user-service,         path: services/user-service }
-          - { name: search-service,       path: services/search-service }
-          - { name: booking-service,      path: services/booking-service }
-          - { name: payment-service,      path: services/payment-service }
-          - { name: notification-service, path: services/notification-service }
+          - { name: user-service,         path: user-service }
+          - { name: search-service,       path: search-service }
+          - { name: booking-service,      path: booking-service }
+          - { name: payment-service,      path: payment-service }
+          - { name: notification-service, path: notification-service }
           - { name: frontend,             path: frontend }
 
     steps:
