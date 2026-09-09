@@ -1,0 +1,99 @@
+name: CI - Build, Scan & Push All Services
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GCP_REGION: ${{ secrets.GCP_REGION }}
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  ARTIFACT_REGISTRY: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/travelbooking
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: Build, Scan, Push (Parallel Matrix)
+  # ─────────────────────────────────────────────
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - { name: user-service,         path: services/user-service }
+          - { name: search-service,       path: services/search-service }
+          - { name: booking-service,      path: services/booking-service }
+          - { name: payment-service,      path: services/payment-service }
+          - { name: notification-service, path: services/notification-service }
+          - { name: frontend,             path: frontend }
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t ${{ env.ARTIFACT_REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }} \
+            -t ${{ env.ARTIFACT_REGISTRY }}/${{ matrix.service.name }}:latest \
+            ./${{ matrix.service.path }}
+
+      - name: Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ARTIFACT_REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }}
+          format: table
+          exit-code: 1
+          severity: HIGH,CRITICAL
+          timeout: 10m
+
+      - name: Push to Artifact Registry
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }}
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ matrix.service.name }}:latest
+
+  # ─────────────────────────────────────────────
+  # Job 2: Update GitOps Repo (After all builds)
+  # ─────────────────────────────────────────────
+  update-gitops:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitOps Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/travelbooking-gitops
+          token: ${{ secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Update Image Tags in Helm Values
+        run: |
+          cd gitops
+          SERVICES=("user-service" "search-service" "booking-service" \
+                    "payment-service" "notification-service" "frontend")
+
+          for svc in "${SERVICES[@]}"; do
+            # Update the image tag in each service's values.yaml
+            sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" charts/${svc}/values.yaml
+          done
+
+      - name: Commit & Push to GitOps Repo
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "deploy: update all services to ${{ github.sha }}"
+          git push
