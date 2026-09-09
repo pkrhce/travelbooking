@@ -1,7 +1,3 @@
-# ─────────────────────────────────────────────
-# Provider Configuration
-# ─────────────────────────────────────────────
-
 terraform {
   required_version = ">= 1.5"
 
@@ -14,17 +10,12 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.12"
     }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "~> 1.14"
-    }
   }
 
-  # Uncomment for remote state (recommended)
-  # backend "gcs" {
-  #   bucket = "your-terraform-state-bucket"
-  #   prefix = "travelbooking"
-  # }
+  backend "gcs" {
+    bucket = "pk-sandbox-507311-terraform-state"
+    prefix = "travelbooking"
+  }
 }
 
 provider "google" {
@@ -32,7 +23,6 @@ provider "google" {
   region  = var.region
 }
 
-# Configure Helm provider after GKE is created
 provider "helm" {
   kubernetes {
     host                   = "https://${google_container_cluster.gke.endpoint}"

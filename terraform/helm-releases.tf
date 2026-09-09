@@ -1,8 +1,3 @@
-# ─────────────────────────────────────────────
-# Helm Releases — Platform Tools on GKE
-# ─────────────────────────────────────────────
-
-# ArgoCD
 resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
@@ -19,7 +14,6 @@ resource "helm_release" "argocd" {
   depends_on = [google_container_node_pool.primary]
 }
 
-# Prometheus + Grafana + Alertmanager (kube-prometheus-stack)
 resource "helm_release" "prometheus_stack" {
   name             = "prometheus"
   repository       = "https://prometheus-community.github.io/helm-charts"
@@ -34,6 +28,11 @@ resource "helm_release" "prometheus_stack" {
   }
 
   set {
+    name  = "grafana.service.type"
+    value = "LoadBalancer"
+  }
+
+  set {
     name  = "alertmanager.enabled"
     value = "true"
   }
@@ -41,7 +40,6 @@ resource "helm_release" "prometheus_stack" {
   depends_on = [google_container_node_pool.primary]
 }
 
-# Falco (Runtime Security)
 resource "helm_release" "falco" {
   name             = "falco"
   repository       = "https://falcosecurity.github.io/charts"
@@ -62,7 +60,6 @@ resource "helm_release" "falco" {
   depends_on = [google_container_node_pool.primary]
 }
 
-# OpenTelemetry Collector
 resource "helm_release" "otel_collector" {
   name             = "otel-collector"
   repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
@@ -101,7 +98,6 @@ resource "helm_release" "otel_collector" {
   depends_on = [google_container_node_pool.primary]
 }
 
-# Jaeger
 resource "helm_release" "jaeger" {
   name             = "jaeger"
   repository       = "https://jaegertracing.github.io/helm-charts"
@@ -122,7 +118,6 @@ resource "helm_release" "jaeger" {
   depends_on = [google_container_node_pool.primary]
 }
 
-# cert-manager
 resource "helm_release" "cert_manager" {
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
@@ -131,7 +126,7 @@ resource "helm_release" "cert_manager" {
   create_namespace = true
 
   set {
-    name  = "installCRDs"
+    name  = "crds.enabled"
     value = "true"
   }
 

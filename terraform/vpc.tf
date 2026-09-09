@@ -1,7 +1,3 @@
-# ─────────────────────────────────────────────
-# VPC Network
-# ─────────────────────────────────────────────
-
 resource "google_compute_network" "vpc" {
   name                    = "travelbooking-vpc"
   auto_create_subnetworks = false

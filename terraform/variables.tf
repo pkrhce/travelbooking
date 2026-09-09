@@ -1,22 +1,13 @@
-# ─────────────────────────────────────────────
-# Input Variables
-# ─────────────────────────────────────────────
-
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
+  default     = "pk-sandbox-507311"
 }
 
 variable "region" {
   description = "GCP Region"
   type        = string
-  default     = "asia-south1"
-}
-
-variable "zone" {
-  description = "GCP Zone"
-  type        = string
-  default     = "asia-south1-a"
+  default     = "us-central1"
 }
 
 variable "cluster_name" {
@@ -26,9 +17,9 @@ variable "cluster_name" {
 }
 
 variable "node_count" {
-  description = "Number of GKE nodes"
+  description = "Initial number of GKE nodes per zone"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "machine_type" {
