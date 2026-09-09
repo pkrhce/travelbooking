@@ -16,11 +16,6 @@ resource "google_container_cluster" "gke" {
     services_secondary_range_name = "services"
   }
 
-  network_policy {
-    enabled  = true
-    provider = "PROVIDER_UNSPECIFIED"
-  }
-
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
