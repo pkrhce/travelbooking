@@ -23,9 +23,6 @@ resource "google_iam_workload_identity_pool" "github" {
 
   # Prevent destroy — GCP soft-deletes WIF pools for 30 days
   # which blocks recreation with the same name
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "google_iam_workload_identity_pool_provider" "github" {
@@ -46,9 +43,6 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "google_service_account_iam_member" "github_actions_wif" {

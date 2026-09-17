@@ -3,6 +3,9 @@ resource "google_container_cluster" "gke" {
   location = var.region
   project  = var.project_id
 
+  # ADDED: Restrict the cluster control plane and default pool to exactly 2 zones
+  node_locations = ["${var.region}-a", "${var.region}-b"]
+
   remove_default_node_pool = true
   initial_node_count       = 1
 
@@ -61,6 +64,9 @@ resource "google_container_node_pool" "primary" {
   location = var.region
   cluster  = google_container_cluster.gke.name
   project  = var.project_id
+
+  # ADDED: Restrict the primary node pool to the same 2 zones
+  node_locations = ["${var.region}-a", "${var.region}-b"]
 
   initial_node_count = var.node_count
 
