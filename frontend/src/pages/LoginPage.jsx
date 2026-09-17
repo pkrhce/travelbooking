@@ -104,7 +104,7 @@ const LoginPage = () => {
               <line x1="6" y1="20" x2="34" y2="20" stroke="white" strokeWidth="1" opacity="0.5" />
               <path d="M28 12l-4 2.5L14 13l-1.5 1.5 7 4-1.5 5.5 2.5-1 1.5-4.5 5.5 2.5 1.5-1.5-4-7.5z" fill="white" />
             </svg>
-            <span className="text-3xl font-black text-white">TravelBooking</span>
+            <span className="text-3xl font-black text-white">TravelBookingIndia</span>
           </div>
           <p className="text-indigo-200 text-sm font-medium">Your journey starts here</p>
         </div>
@@ -116,7 +116,7 @@ const LoginPage = () => {
             <span className="text-gradient">world</span> your way
           </h2>
           <p className="text-indigo-200 text-lg leading-relaxed max-w-md">
-            Book flights and hotels at unbeatable prices. Millions of travelers trust TravelBooking every day.
+            Book flights and hotels at unbeatable prices. Millions of travelers trust TravelBookingIndia every day.
           </p>
         </div>
 
@@ -146,7 +146,7 @@ const LoginPage = () => {
               <line x1="6" y1="20" x2="34" y2="20" stroke="#4f46e5" strokeWidth="1" opacity="0.5" />
               <path d="M28 12l-4 2.5L14 13l-1.5 1.5 7 4-1.5 5.5 2.5-1 1.5-4.5 5.5 2.5 1.5-1.5-4-7.5z" fill="#4f46e5" />
             </svg>
-            <span className="text-2xl font-black text-indigo-700">TravelBooking</span>
+            <span className="text-2xl font-black text-indigo-700">TravelBookingIndia</span>
           </div>
 
           <div className="mb-8">
@@ -236,7 +236,7 @@ const LoginPage = () => {
 
           <div className="mt-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs text-slate-400 font-medium">New to TravelBooking?</span>
+            <span className="text-xs text-slate-400 font-medium">New to TravelBookingIndia?</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
